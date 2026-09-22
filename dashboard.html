@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Location Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
+
+        .box {
+            max-width: 600px;
+            margin: auto;
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+        }
+
+        p {
+            font-size: 18px;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 18px;
+            background: #222;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>Location Dashboard</h1>
+
+    <p id="status">Waiting for phone location...</p>
+
+    <div id="location"></div>
+
+</div>
+
+<script>
+
+async function getLocation() {
+
+    try {
+
+        const response = await fetch("/api/location");
+
+        const data = await response.json();
+
+        if (!data) {
+            document.getElementById("status").innerText =
+                "Waiting for phone location...";
+            return;
+        }
+
+        document.getElementById("status").innerText =
+            "Location received";
+
+        document.getElementById("location").innerHTML = `
+
+            <p>
+                <strong>Latitude:</strong>
+                ${data.latitude}
+            </p>
+
+            <p>
+                <strong>Longitude:</strong>
+                ${data.longitude}
+            </p>
+
+            <p>
+                <strong>Accuracy:</strong>
+                ${Math.round(data.accuracy)} meters
+            </p>
+
+            <p>
+                <strong>Time:</strong>
+                ${data.time}
+            </p>
+
+            <a
+                href="https://www.google.com/maps?q=${data.latitude},${data.longitude}"
+                target="_blank"
+            >
+                Open in Google Maps
+            </a>
+
+        `;
+
+    } catch (error) {
+
+        document.getElementById("status").innerText =
+            "Server connection error.";
+
+    }
+}
+
+setInterval(getLocation, 2000);
+
+getLocation();
+
+</script>
+
+</body>
+</html>
